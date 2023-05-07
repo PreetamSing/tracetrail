@@ -1,3 +1,4 @@
+import './encrypt'
 import winston from 'winston'
 
 const WINSTON_FORMAT = winston.format.combine(

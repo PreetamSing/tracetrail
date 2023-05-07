@@ -2,7 +2,11 @@ import path from 'path'
 import cors from 'cors'
 import express, { Request, Response } from 'express'
 import { Paginator } from './pagination.helper';
+import { encrypt, decrypt } from 'text-encrypter'
 
+
+const shift = 1;
+const ignoreSpecialCharacters = false;
 
 export default function (params: any) {
 
@@ -22,12 +26,16 @@ export default function (params: any) {
 
     app.get('/api/requests', async (req: Request, res: Response) => {
 
+        let payload: any = req.body.decrypt()
+
+
+
         const {
             startIndex = 0,
             itemsPerPage = 10,
-        } = req.query
+        } = payload
 
-        const result = await Paginator.Paginate({
+        const paginatorResult = await Paginator.Paginate({
             model: MONGO_MODEL,
             startIndex: +startIndex,
             itemsPerPage: +itemsPerPage,
@@ -36,9 +44,11 @@ export default function (params: any) {
             }
         })
 
+        let result: any = encrypt(JSON.stringify(paginatorResult), shift, ignoreSpecialCharacters);
+
         return res.json({
             message: 'Requests fetched successfully.',
-            ...result,
+            data: result
         })
     })
 
